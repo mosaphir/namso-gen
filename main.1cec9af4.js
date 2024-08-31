@@ -8267,4 +8267,59 @@
         }), document.getElementById("root"))
     }()
   }();
-  
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDUFbApjAt0Dpfov3uNqLn1YuBHkhsfKww",
+  authDomain: "multi-cc-gen.firebaseapp.com",
+  projectId: "multi-cc-gen",
+  storageBucket: "multi-cc-gen.appspot.com",
+  messagingSenderId: "896988804545",
+  appId: "1:896988804545:web:317be1f3b9c4a4edb02b40"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+const hitCounter = document.getElementById("hit-counter");
+hitCounter.style.display = "none";
+
+const db = firebase.database().ref("totalHits");
+db.on("value", (snapshot) => {
+  hitCounter.textContent = snapshot.val();
+});
+
+const userCookieName = "returningVisitor";
+checkUserCookie(userCookieName);
+function checkUserCookie(userCookieName) {
+  const regEx = new RegExp(userCookieName, "g");
+  const cookieExists = document.cookie.match(regEx);
+  if (cookieExists != null) {
+    hitCounter.style.display = "inline-block";
+  } else {
+    createUserCookie(userCookieName);
+    db.transaction(
+      (totalHits) => totalHits + 1,
+      (error) => {
+        if (error) {
+          console.log(error);
+        } else {
+          hitCounter.style.display = "inline-block";
+        }
+      }
+    );
+  }
+}
+
+function createUserCookie(userCookieName) {
+  const userCookieValue = "Yes";
+  const userCookieDays = 7;
+  let expiryDate = new Date();
+  expiryDate.setDate(expiryDate.getDate() + userCookieDays);
+  document.cookie =
+    userCookieName +
+    "=" +
+    userCookieValue +
+    "; expires=" +
+    expiryDate.toGMTString() +
+    "path=/";
+}
